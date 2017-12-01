@@ -1,0 +1,2010 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>The Great Recession: US</title>
+<style type = 'text/css'>
+  .legend {
+    font-size: 20px;
+    font-weight: bold;
+    text-anchor: middle;
+  }
+
+  .axis {
+    font: 20px sans-serif;
+  }
+
+  .y_label {
+    font-size: 22px;
+    font-weight: bold;
+    text-anchor: middle;
+  }
+
+  .heading {
+    font-size: 30px;
+  }
+
+  .circle1 {
+    fill: #a8786e;
+  }
+
+  .circle2 {
+    fill: #6dccda;
+  }
+
+  .line1 {
+    shape-rendering: geometricPrecision;
+  }
+
+  .line2 {
+    shape-rendering: geometricPrecision;
+  }
+
+  label {
+    font-size: 20px;
+  }
+
+</style>
+</head>
+
+<body>
+  <button id="start">Begin</button>
+  <button id="reset">Reset</button>
+
+  <form name = 'unemployVS' id = 'unemployVS'>
+
+  </form>
+
+  <br/>
+
+  <script src="lib/d3.v4.min.js"></script>
+
+  <script type="text/javascript">
+
+
+
+    var w = 1800, h = 800, padding = 70;
+    var transition_load = 6000;
+    var transition_delay = 15000;
+    var transition_obj = null;
+
+    var svgContainer = d3.select("body")
+                          .append("svg")
+                          .attr('width', w)
+                          .attr('height', h);
+
+    var defs = svgContainer.append("defs");
+    var filter = defs.append("filter")
+    		              .attr("id","glow");
+
+    filter.append("feGaussianBlur")
+          	.attr("class", "blur")
+          	.attr("stdDeviation","4.5")
+          	.attr("result","coloredBlur");
+
+    var feMerge = filter.append("feMerge");
+
+    feMerge.append("feMergeNode")
+    	     .attr("in","coloredBlur");
+    feMerge.append("feMergeNode")
+    	     .attr("in","SourceGraphic");
+
+    d3.csv("data/Population_Data.csv", function(error, data) {
+      console.log(data);
+      vals = [];
+      val = [];
+      attributes = ['Series Name','2003','2004','2005','2006','2007','2008','2009','2010','2011','2012','2013','2014','2015','2016'];
+      data.forEach(function (d) {
+        attributes.forEach(function (att) {
+          if(att == 'Series Name')  {
+            if(val.length != 0) {
+              vals[id] = val;
+            }
+            else {
+              val = []
+            }
+
+            if (d[att] == 'Unemployment, total (% of total labor force) (modeled ILO estimate)') {
+              id = 'unemployed_percent';
+              val = [];
+            } else if(d[att] == 'GDP growth (annual %)') {
+              id = 'gdp_percent';
+              val = [];
+            } else if(d[att] == 'Population, total') {
+              id = 'population_total';
+              val = [];
+            } else if(d[att] == 'Labor force, total') {
+              id = 'labor_total';
+              val = [];
+            } else if(d[att] == 'Total employment, total (ages 15+)') {
+              id = 'employed_total';
+              val = [];
+            } else if(d[att] == 'Total unemployed') {
+              id = 'unemployed_total';
+              val = [];
+            } else if(d[att] == 'Inflation, consumer prices (annual %)') {
+              id = 'inflation_percent';
+              val = [];
+            } else if(d[att] == '(Unadj) Unemployment Rate - Construction Industry, Private Wage and Salary Workers') {
+              id = 'industry_construction_percent';
+              val = [];
+            } else if(d[att] == '(Unadj) Unemployment Rate - Information Industry, Private Wage and Salary Workers') {
+              id = 'industry_information_percent';
+              val = [];
+            } else if(d[att] == '(Unadj) Unemployment Rate - Manufacturing Industry, Private Wage and Salary Workers') {
+              id = 'industry_manufacturing_percent';
+              val = [];
+            } else if(d[att] == '(Unadj) Unemployment Rate - Non Durable Goods Industry, Private Wage and Salary Workers') {
+              id = 'industry_nondurable_percent';
+              val = [];
+            } else if(d[att] == '(Unadj) Unemployment Rate - Professional and Business Services Industry, Private Wage and Salary Workers') {
+              id = 'industry_professional_percent';
+              val = [];
+            } else if(d[att] == '(Change) Unemployment Rate - Construction Industry, Private Wage and Salary Workers') {
+              id = 'industry_construction_change_percent';
+              val = [];
+            } else if(d[att] == '(Change) Unemployment Rate - Information Industry, Private Wage and Salary Workers') {
+              id = 'industry_information_change_percent';
+              val = [];
+            } else if(d[att] == '(Change) Unemployment Rate - Manufacturing Industry, Private Wage and Salary Workers') {
+              id = 'industry_manufacturing_change_percent';
+              val = [];
+            } else if(d[att] == '(Change) Unemployment Rate - Non Durable Goods Industry, Private Wage and Salary Workers') {
+              id = 'industry_nondurable_change_percent';
+              val = [];
+            } else if(d[att] == '(Change) Unemployment Rate - Professional and Business Services Industry, Private Wage and Salary Workers') {
+              id = 'industry_professional_change_percent';
+              val = [];
+            } else if(d[att] == '(Unadj) Unemployment Rate - Men, Nonveterans, 18 years and over') {
+              id = 'gender_male_percent';
+              val = [];
+            } else if(d[att] == '(Unadj) Unemployment Rate - Women, Nonveterans, 18 years and over') {
+              id = 'gender_female_percent';
+              val = [];
+            } else if(d[att] == '(Change) Unemployment Rate - Men, Nonveterans, 18 years and over') {
+              id = 'gender_male_change_percent';
+              val = [];
+            } else if(d[att] == '(Change) Unemployment Rate - Women, Nonveterans, 18 years and over') {
+              id = 'gender_female_change_percent';
+              val = [];
+            } else if(d[att] == '(Unadj) Unemployment Rate - Nonveterans, 18 years and over, Asian') {
+              id = 'race_asian_percent';
+              val = [];
+            } else if(d[att] == '(Unadj) Unemployment Rate - Nonveterans, 18 years and over, Black or African American') {
+              id = 'race_black_percent';
+              val = [];
+            } else if(d[att] == '(Unadj) Unemployment Rate - Nonveterans, 18 years and over, Hispanic or Latino') {
+              id = 'race_hispanic_percent';
+              val = [];
+            } else if(d[att] == '(Unadj) Unemployment Rate - Nonveterans, 18 years and over, White') {
+              id = 'race_white_percent';
+              val = [];
+            } else if(d[att] == '(Change) Unemployment Rate - Nonveterans, 18 years and over, Asian') {
+              id = 'race_asian_change_percent';
+              val = [];
+            } else if(d[att] == '(Change) Unemployment Rate - Nonveterans, 18 years and over, Black or African American') {
+              id = 'race_black_change_percent';
+              val = [];
+            } else if(d[att] == '(Change) Unemployment Rate - Nonveterans, 18 years and over, Hispanic or Latino') {
+              id = 'race_hispanic_change_percent';
+              val = [];
+            } else if(d[att] == '(Change) Unemployment Rate - Nonveterans, 18 years and over, White') {
+              id = 'race_white_change_percent';
+              val = [];
+            } else {
+              id = '';
+              val = [];
+            }
+          } else if(att != 'Series Name' & id != '')  {
+            val[att] = parseFloat(+d[att]);
+          }
+        })
+      });
+
+      left_column = 'unemployed_percent';
+
+      bottom_column_x = Object.keys(vals[left_column]);
+      xMin = parseInt(d3.min(bottom_column_x)) + 1;
+      xMax = parseInt(d3.max(bottom_column_x));
+
+      left_column_y = Object.values(vals[left_column]);
+      yMin = d3.min(left_column_y);
+      yMax = d3.max(left_column_y);
+
+      var dateParser = d3.timeParse("%Y");
+
+      var xAxisScale = d3.scaleTime()
+                          .domain([new Date(xMin, 0, 0), new Date(xMax, 0, 0)])
+                          .range([padding, w - padding])
+                          .nice();
+
+      var xAxis = d3.axisBottom()
+                          .scale(xAxisScale)
+                          .tickSize(10)
+                          .tickFormat(d3.timeFormat("%Y"));
+
+      var yAxisScale = d3.scaleLinear()
+                          .domain([yMax, yMin])
+                          .range([padding, h - padding])
+                          .nice();
+
+      var yAxis = d3.axisLeft()
+                          .scale(yAxisScale)
+                          .tickSize(10);
+
+      svgContainer.append('g')
+                  .attr('transform', 'translate('+ 0 + ', ' + (h - padding) +')')
+                  .classed('x axis', true)
+                  .call(xAxis);
+
+      svgContainer.append("text")
+                  .attr("text-anchor", "middle")
+                  .attr("transform", "translate("+ (w/2) +","+(h-(padding/4))+")")
+                  .attr('id', 'x_text')
+                  .text("Year")
+                  .style("font-size", "26px").style("font","sans-serif").style("fill","blue");
+
+      ref_data = left_column_y.map( function(item, i) {
+                  return {"value": item, "year": dateParser(bottom_column_x[i])};
+          });
+      console.log(ref_data);
+
+      d3.select("#start").on("click", function() {
+
+        window.clearTimeout(transition_obj);
+
+        d3.selectAll('.line1').remove();
+        d3.selectAll('.line2').remove();
+        d3.selectAll('.circle1').remove();
+        d3.selectAll('.circle2').remove();
+        d3.selectAll('.circle3').remove();
+        d3.selectAll('.y_axis1').remove();
+        d3.selectAll('.y_text1').remove();
+        d3.selectAll('.y_axis2').remove();
+        d3.selectAll('.y_text2').remove();
+        d3.selectAll('.y_label').remove();
+        d3.selectAll('.heading').remove();
+
+        document.getElementById('vs_none').removeAttribute('disabled');
+        document.getElementById('vs_gdp').removeAttribute('disabled');
+        document.getElementById('vs_inflation').removeAttribute('disabled');
+        document.getElementById('vs_industry').removeAttribute('disabled');
+        document.getElementById('vs_industry_change').removeAttribute('disabled');
+        document.getElementById('vs_gender').removeAttribute('disabled');
+        document.getElementById('vs_gender_change').removeAttribute('disabled');
+        document.getElementById('vs_race').removeAttribute('disabled');
+        document.getElementById('vs_race_change').removeAttribute('disabled');
+
+        document.getElementById('vs_none').checked = true;
+
+        transition_obj = window.setInterval(function(){
+          document.getElementById('vs_gdp').click();
+        }, transition_delay);
+
+        svgContainer.append('g')
+                    .attr('transform', 'translate('+ (padding) + ', ' + 0 + ')')
+                    .attr('class', 'y_axis1')
+                    .classed('y axis', true)
+                    .call(yAxis);
+
+        svgContainer.append("text")
+                    .attr("text-anchor", "middle")
+                    .attr("transform", "translate("+ (padding/2 - 15) +","+(h/2)+")rotate(-90)")
+                    .attr('class', 'y_text1')
+                    .text("Unemployment Rate (% of total labor force)")
+                    .style("font-size", "26px").style("font","sans-serif").style("fill","blue");
+
+        heading = svgContainer.append("text")
+                         .attr("text-anchor", "middle")
+                         .attr("transform", "translate("+ (w/2) +","+(padding / 3)+")")
+                         .attr('class', 'heading')
+                         .text("Unemployment Rate (2003 - 2016)");
+
+       label1 = svgContainer.append("text")
+                        .attr("text-anchor", "middle")
+                        .attr("transform", "translate("+ (w/2) +","+(padding / 3 + 30)+")")
+                        .attr('class', 'y_label')
+                        .text("Unemployment Rate")
+                        .style("fill","#a8786e");
+
+        var line1 = d3.line()
+                    .x(function(d) { return +xAxisScale(d.year); })
+                    .y(function(d) { return +yAxisScale(d.value); });
+
+        var path = svgContainer.append("path")
+                      .attr("class", "line1")
+                      .attr("d", line1(ref_data))
+                      .attr("stroke", "#a8786e")
+                      .attr("stroke-width", 2)
+                      .attr("fill", "none");
+
+        var totalLength = path.node().getTotalLength();
+
+        path.attr("stroke-dasharray", totalLength + " " + totalLength)
+            .attr("stroke-dashoffset", totalLength)
+            .transition()
+            .duration(transition_load)
+            .ease(d3.easeLinear)
+            .attr("stroke-dashoffset", 2);
+
+        svgContainer.selectAll("circle")
+            .data(ref_data)
+            .enter()
+            .append('circle')
+            .attr("class", "circle1")
+            .attr('r', 3)
+            .attr("cx", function (d) { return +xAxisScale(d.year); })
+            .attr("cy", function (d) { return +yAxisScale(d.value); });
+
+        d3.selectAll(".line1")
+    		   .style("filter","url(#glow)");
+
+      });
+
+      d3.select("#reset").on("click", function() {
+
+        window.clearTimeout(transition_obj);
+
+        d3.selectAll('.line1').remove();
+        d3.selectAll('.line2').remove();
+        d3.selectAll('.circle1').remove();
+        d3.selectAll('.circle2').remove();
+        d3.selectAll('.circle3').remove();
+        d3.selectAll('.y_axis1').remove();
+        d3.selectAll('.y_text1').remove();
+        d3.selectAll('.y_axis2').remove();
+        d3.selectAll('.y_text2').remove();
+        d3.selectAll('.y_label').remove();
+        d3.selectAll('.heading').remove();
+
+        document.getElementById('vs_none').checked = false;
+        document.getElementById('vs_gdp').checked = false;
+        document.getElementById('vs_inflation').checked = false;
+        document.getElementById('vs_industry').checked = false;
+        document.getElementById('vs_industry_change').checked = false;
+        document.getElementById('vs_gender').checked = false;
+        document.getElementById('vs_gender_change').checked = false;
+        document.getElementById('vs_race').checked = false;
+        document.getElementById('vs_race_change').checked = false;
+
+        document.getElementById('vs_none').disabled = true;
+        document.getElementById('vs_gdp').disabled = true;
+        document.getElementById('vs_inflation').disabled = true;
+        document.getElementById('vs_industry').disabled = true;
+        document.getElementById('vs_industry_change').disabled = true;
+        document.getElementById('vs_gender').disabled = false;
+        document.getElementById('vs_gender_change').disabled = false;
+        document.getElementById('vs_race').disabled = false;
+        document.getElementById('vs_race_change').disabled = false;
+
+      });
+
+        var unemployVSForm = d3.select('#unemployVS');
+        unemployVSForm.append('input')
+                        .attr('type', 'radio')
+                        .attr('value', 'none')
+                        .attr('id', 'vs_none')
+                        .attr('name', 'radunemployVS')
+                        .attr('disabled', 'disabled')
+                        .on('click', function () {
+                          d3.selectAll('.line2').remove();
+                          d3.selectAll('.circle1').remove();
+                          d3.selectAll('.circle2').remove();
+                          d3.selectAll('.circle3').remove();
+                          d3.selectAll('.y_axis2').remove();
+                          d3.selectAll('.y_text2').remove();
+                          d3.selectAll('.y_label').remove();
+                          d3.selectAll('.heading').remove();
+                          document.getElementById('start').click();
+
+                        });
+        unemployVSForm.append('label').html('None');
+
+        unemployVSForm.append('input')
+                       .attr('type', 'radio')
+                       .attr('value', 'none')
+                       .attr('id', 'vs_gdp')
+                       .attr('name', 'radunemployVS')
+                       .attr('disabled', 'disabled')
+                       .on('click', function () {
+                         d3.selectAll('.line1').remove();
+                         d3.selectAll('.line2').remove();
+                         d3.selectAll('.circle1').remove();
+                         d3.selectAll('.circle2').remove();
+                         d3.selectAll('.circle3').remove();
+                         d3.selectAll('.y_axis1').remove();
+                         d3.selectAll('.y_text1').remove();
+                         d3.selectAll('.y_axis2').remove();
+                         d3.selectAll('.y_text2').remove();
+                         d3.selectAll('.y_label').remove();
+                         d3.selectAll('.heading').remove();
+
+                         window.clearTimeout(transition_obj);
+                         transition_obj = window.setTimeout(function(){
+                           document.getElementById('vs_inflation').click();
+                         }, transition_delay);
+
+                         svgContainer.append('g')
+                                     .attr('transform', 'translate('+ (padding) + ', ' + 0 + ')')
+                                     .attr('class', 'y_axis1')
+                                     .classed('y axis', true)
+                                     .call(yAxis);
+
+                         svgContainer.append("text")
+                                     .attr("text-anchor", "middle")
+                                     .attr("transform", "translate("+ (padding/2 - 15) +","+(h/2)+")rotate(-90)")
+                                     .attr('class', 'y_text1')
+                                     .text("Unemployment Rate (% of total labor force)")
+                                     .style("font-size", "26px").style("font","sans-serif").style("fill","blue");
+
+                         heading = svgContainer.append("text")
+                                          .attr("text-anchor", "middle")
+                                          .attr("transform", "translate("+ (w/2) +","+(padding / 3)+")")
+                                          .attr('class', 'heading')
+                                          .text("Unemployment Rate and GDP (2003 - 2016)");
+
+                         var line1 = d3.line()
+                                     .x(function(d) { return +xAxisScale(d.year); })
+                                     .y(function(d) { return +yAxisScale(d.value); });
+
+                         var path = svgContainer.append("path")
+                                       .attr("class", "line1")
+                                       .attr("d", line1(ref_data))
+                                       .attr("stroke", "#a8786e")
+                                       .attr("stroke-width", 2)
+                                       .attr("fill", "none");
+
+                         label1 = svgContainer.append("text")
+                                          .attr("text-anchor", "middle")
+                                          .attr("transform", "translate("+ (w/2 - 250) +","+(padding / 3 + 30)+")")
+                                          .attr('class', 'y_label')
+                                          .text("Unemployment Rate")
+                                          .style("fill","#a8786e");
+
+                         var totalLength = path.node().getTotalLength();
+
+                         path.attr("stroke-dasharray", totalLength + " " + totalLength)
+                             .attr("stroke-dashoffset", totalLength)
+                             .transition()
+                             .duration(transition_load)
+                             .ease(d3.easeLinear)
+                             .attr("stroke-dashoffset", 2);
+
+                         svgContainer.selectAll("circle")
+                             .data(ref_data)
+                             .enter()
+                             .append('circle')
+                             .attr("class", "circle1")
+                             .attr('r', 3)
+                             .attr("cx", function (d) { return +xAxisScale(d.year); })
+                             .attr("cy", function (d) { return +yAxisScale(d.value); });
+
+                         d3.selectAll(".line1")
+                     		   .style("filter","url(#glow)");
+
+                          right_column = 'gdp_percent';
+                          right_column_y = Object.values(vals[right_column]);
+                          yMin_right = d3.min(right_column_y);
+                          yMax_right = d3.max(right_column_y);
+
+                          var yAxisScaleRight = d3.scaleLinear()
+                                             .domain([yMax_right, yMin_right])
+                                             .range([padding, h - padding])
+                                             .nice();
+
+                          var yAxisRight = d3.axisRight()
+                                             .scale(yAxisScaleRight)
+                                             .tickSize(10);
+
+                          yAxisRightObj = svgContainer.append('g')
+                                     .attr('transform', 'translate('+ (w - padding) + ', ' + 0 + ')')
+                                     .attr('class', 'y_axis2')
+                                     .classed('y axis', true)
+                                     .call(yAxisRight);
+
+                          yAxisRightText = svgContainer.append("text")
+                                     .attr("text-anchor", "middle")
+                                     .attr("transform", "translate("+ (w - padding/2 + 15) +","+(h/2)+")rotate(+90)")
+                                     .attr('class', 'y_text2')
+                                     .text("GDP growth (annual %)")
+                                     .style("font-size", "26px").style("font","sans-serif").style("fill","blue");
+
+                          ref_data_right = right_column_y.map( function(item, i) {
+                                     return {"value": item, "year": dateParser(bottom_column_x[i])};
+                          });
+
+                          console.log(ref_data_right);
+
+                          var line2 = d3.line()
+                                     .x(function(d) { return +xAxisScale(d.year); })
+                                     .y(function(d) { return +yAxisScaleRight(d.value); });
+
+                          var path2 = svgContainer.append("path")
+                                     .attr("class", "line2")
+                                     .attr("d", line2(ref_data_right))
+                                     .attr("stroke", "#6dccda")
+                                     .attr("stroke-width", 2)
+                                     .attr("fill", "none");
+
+                          label2 = svgContainer.append("text")
+                                           .attr("text-anchor", "middle")
+                                           .attr("transform", "translate("+ (w/2 + 200) +","+(padding / 3 + 30)+")")
+                                           .attr('class', 'y_label')
+                                           .text("GDP growth (annual %)")
+                                           .style("fill","#6dccda");
+
+                          var totalLength = path2.node().getTotalLength();
+
+                          path2.attr("stroke-dasharray", totalLength + " " + totalLength)
+                                    .attr("stroke-dashoffset", totalLength)
+                                    .transition()
+                                    .duration(transition_load)
+                                    .ease(d3.easeLinear)
+                                    .attr("stroke-dashoffset", 2);
+
+                          svgContainer.selectAll("circle1")
+                                    .data(ref_data_right)
+                                    .enter()
+                                    .append('circle')
+                                    .attr("class", "circle2")
+                                    .attr('r', 3)
+                                    .attr("cx", function (d) { return +xAxisScale(d.year); })
+                                    .attr("cy", function (d) { return +yAxisScaleRight(d.value); });
+
+                          d3.selectAll(".line2")
+                                		.style("filter","url(#glow)");
+
+                       });
+        unemployVSForm.append('label').html('GDP Growth ');
+
+        unemployVSForm.append('input')
+                        .attr('type', 'radio')
+                        .attr('value', 'none')
+                        .attr('id', 'vs_inflation')
+                        .attr('name', 'radunemployVS')
+                        .attr('disabled', 'disabled')
+                        .on('click', function () {
+                          d3.selectAll('.line1').remove();
+                          d3.selectAll('.line2').remove();
+                          d3.selectAll('.circle1').remove();
+                          d3.selectAll('.circle2').remove();
+                          d3.selectAll('.circle3').remove();
+                          d3.selectAll('.y_axis1').remove();
+                          d3.selectAll('.y_text1').remove();
+                          d3.selectAll('.y_axis2').remove();
+                          d3.selectAll('.y_text2').remove();
+                          d3.selectAll('.y_label').remove();
+                          d3.selectAll('.heading').remove();
+
+                          window.clearTimeout(transition_obj);
+                          transition_obj = window.setTimeout(function(){
+                            document.getElementById('vs_industry').click();
+                          }, transition_delay);
+
+                          svgContainer.append('g')
+                                      .attr('transform', 'translate('+ (padding) + ', ' + 0 + ')')
+                                      .attr('class', 'y_axis1')
+                                      .classed('y axis', true)
+                                      .call(yAxis);
+
+                          svgContainer.append("text")
+                                      .attr("text-anchor", "middle")
+                                      .attr("transform", "translate("+ (padding/2 - 15) +","+(h/2)+")rotate(-90)")
+                                      .attr('class', 'y_text1')
+                                      .text("Unemployment Rate (% of total labor force)")
+                                      .style("font-size", "26px").style("font","sans-serif").style("fill","blue");
+
+                          heading = svgContainer.append("text")
+                                           .attr("text-anchor", "middle")
+                                           .attr("transform", "translate("+ (w/2) +","+(padding / 3)+")")
+                                           .attr('class', 'heading')
+                                           .text("Unemployment Rate and Inflation (2003 - 2016)");
+
+                          var line1 = d3.line()
+                                      .x(function(d) { return +xAxisScale(d.year); })
+                                      .y(function(d) { return +yAxisScale(d.value); });
+
+                          var path = svgContainer.append("path")
+                                        .attr("class", "line1")
+                                        .attr("d", line1(ref_data))
+                                        .attr("stroke", "#a8786e")
+                                        .attr("stroke-width", 2)
+                                        .attr("fill", "none");
+
+                          label1 = svgContainer.append("text")
+                                           .attr("text-anchor", "middle")
+                                           .attr("transform", "translate("+ (w/2 - 250) +","+(padding / 3 + 30)+")")
+                                           .attr('class', 'y_label')
+                                           .text("Unemployment Rate")
+                                           .style("fill","#a8786e");
+
+                          var totalLength = path.node().getTotalLength();
+
+                          path.attr("stroke-dasharray", totalLength + " " + totalLength)
+                              .attr("stroke-dashoffset", totalLength)
+                              .transition()
+                              .duration(transition_load)
+                              .ease(d3.easeLinear)
+                              .attr("stroke-dashoffset", 2);
+
+                          svgContainer.selectAll("circle")
+                              .data(ref_data)
+                              .enter()
+                              .append('circle')
+                              .attr("class", "circle1")
+                              .attr('r', 3)
+                              .attr("cx", function (d) { return +xAxisScale(d.year); })
+                              .attr("cy", function (d) { return +yAxisScale(d.value); });
+
+                          d3.selectAll(".line1")
+                      		   .style("filter","url(#glow)");
+
+                          right_column = 'inflation_percent';
+                          right_column_y = Object.values(vals[right_column]);
+                          yMin_right = d3.min(right_column_y);
+                          yMax_right = d3.max(right_column_y);
+
+                          var yAxisScaleRight = d3.scaleLinear()
+                                             .domain([yMax_right, yMin_right])
+                                             .range([padding, h - padding])
+                                             .nice();
+
+                          var yAxisRight = d3.axisRight()
+                                             .scale(yAxisScaleRight)
+                                             .tickSize(10);
+
+                          yAxisRightObj = svgContainer.append('g')
+                                           .attr('transform', 'translate('+ (w - padding) + ', ' + 0 + ')')
+                                           .attr('class', 'y_axis2')
+                                           .classed('y axis', true)
+                                           .call(yAxisRight);
+
+                          yAxisRightText = svgContainer.append("text")
+                                           .attr("text-anchor", "middle")
+                                           .attr("transform", "translate("+ (w - padding/2 + 15) +","+(h/2)+")rotate(+90)")
+                                           .attr('class', 'y_text2')
+                                           .text("Inflation, consumer prices (annual %)")
+                                           .style("font-size", "26px").style("font","sans-serif").style("fill","blue");
+
+                          ref_data_right = right_column_y.map( function(item, i) {
+                                     return {"value": item, "year": dateParser(bottom_column_x[i])};
+                          });
+
+                          console.log(ref_data_right);
+
+                          var line2 = d3.line()
+                                     .x(function(d) { return +xAxisScale(d.year); })
+                                     .y(function(d) { return +yAxisScaleRight(d.value); });
+
+                          var path2 = svgContainer.append("path")
+                                     .attr("class", "line2")
+                                     .attr("d", line2(ref_data_right))
+                                     .attr("stroke", "#6dccda")
+                                     .attr("stroke-width", 2)
+                                     .attr("fill", "none");
+
+                          label2 = svgContainer.append("text")
+                                          .attr("text-anchor", "middle")
+                                          .attr("transform", "translate("+ (w/2 + 200) +","+(padding / 3 + 30)+")")
+                                          .attr('class', 'y_label')
+                                          .text("Inflation, consumer prices (annual %)")
+                                          .style("fill","#6dccda");
+
+                          var totalLength = path2.node().getTotalLength();
+
+                          path2.attr("stroke-dasharray", totalLength + " " + totalLength)
+                                    .attr("stroke-dashoffset", totalLength)
+                                    .transition()
+                                    .duration(transition_load)
+                                    .ease(d3.easeLinear)
+                                    .attr("stroke-dashoffset", 2);
+
+                          svgContainer.selectAll("circle1")
+                                    .data(ref_data_right)
+                                    .enter()
+                                    .append('circle')
+                                    .attr("class", "circle2")
+                                    .attr('r', 3)
+                                    .attr("cx", function (d) { return +xAxisScale(d.year); })
+                                    .attr("cy", function (d) { return +yAxisScaleRight(d.value); });
+
+                          d3.selectAll(".line2")
+                                		.style("filter","url(#glow)");
+
+                        });
+        unemployVSForm.append('label').html('Inflation Consumer Price ');
+
+        unemployVSForm.append('input')
+                       .attr('type', 'radio')
+                       .attr('value', 'none')
+                       .attr('id', 'vs_industry')
+                       .attr('name', 'radunemployVS')
+                       .attr('disabled', 'disabled')
+                       .on('click', function () {
+                          d3.selectAll('.line1').remove();
+                          d3.selectAll('.line2').remove();
+                          d3.selectAll('.circle1').remove();
+                          d3.selectAll('.circle2').remove();
+                          d3.selectAll('.circle3').remove();
+                          d3.selectAll('.y_axis1').remove();
+                          d3.selectAll('.y_text1').remove();
+                          d3.selectAll('.y_axis2').remove();
+                          d3.selectAll('.y_text2').remove();
+                          d3.selectAll('.y_label').remove();
+                          d3.selectAll('.heading').remove();
+
+                          window.clearTimeout(transition_obj);
+                          transition_obj = window.setTimeout(function(){
+                            document.getElementById('vs_industry_change').click();
+                          }, transition_delay);
+
+                          left_column2_1 = 'industry_construction_percent';
+                          left_column2_2 = 'industry_information_percent';
+                          left_column2_3 = 'industry_manufacturing_percent';
+                          left_column2_4 = 'industry_nondurable_percent';
+                          left_column2_5 = 'industry_professional_percent';
+
+                          l1 = Object.values(vals[left_column2_1]);
+                          l2 = Object.values(vals[left_column2_2]);
+                          l3 = Object.values(vals[left_column2_3]);
+                          l4 = Object.values(vals[left_column2_4]);
+                          l5 = Object.values(vals[left_column2_5]);
+
+                          ref_data2_1 = l1.map( function(item, i) {
+                                        return {"value": item, "year": dateParser(bottom_column_x[i])};
+                             });
+
+                          ref_data2_2 = l2.map( function(item, i) {
+                                        return {"value": item, "year": dateParser(bottom_column_x[i])};
+                            });
+
+                          ref_data2_3 = l3.map( function(item, i) {
+                                        return {"value": item, "year": dateParser(bottom_column_x[i])};
+                            });
+
+                          ref_data2_4 = l4.map( function(item, i) {
+                                        return {"value": item, "year": dateParser(bottom_column_x[i])};
+                            });
+
+                          ref_data2_5 = l5.map( function(item, i) {
+                                        return {"value": item, "year": dateParser(bottom_column_x[i])};
+                              });
+
+                          y2Min = 0.0;
+                          y2Max = 25.0;
+
+                          var yAxisScale2 = d3.scaleLinear()
+                                             .domain([y2Max, y2Min])
+                                             .range([padding, h - padding])
+                                             .nice();
+
+                          var yAxis2 = d3.axisLeft()
+                                             .scale(yAxisScale2)
+                                             .tickSize(10);
+
+                          svgContainer.append('g')
+                                     .attr('transform', 'translate('+ (padding) + ', ' + 0 + ')')
+                                     .attr('class', 'y_axis1')
+                                     .classed('y axis', true)
+                                     .call(yAxis2);
+
+                          svgContainer.append("text")
+                                     .attr("text-anchor", "middle")
+                                     .attr("transform", "translate("+ (padding/2 - 15) +","+(h/2)+")rotate(-90)")
+                                     .attr('class', 'y_text1')
+                                     .text("Unemployment Rate (% of total labor force)")
+                                     .style("font-size", "26px").style("font","sans-serif").style("fill","blue");
+
+                         heading = svgContainer.append("text")
+                                          .attr("text-anchor", "middle")
+                                          .attr("transform", "translate("+ (w/2) +","+(padding / 3)+")")
+                                          .attr('class', 'heading')
+                                          .text("Unemployment Rate for various industries (2003 - 2016)");
+
+                          var line2 = d3.line()
+                                     .x(function(d) { return +xAxisScale(d.year); })
+                                     .y(function(d) { return +yAxisScale2(d.value); });
+
+                          //industry_construction_percent
+                          var path2 = svgContainer.append("path")
+                                       .attr("class", "line2")
+                                       .attr("d", line2(ref_data2_1))
+                                       .attr("stroke", "#6dccda")
+                                       .attr("stroke-width", 2)
+                                       .attr("fill", "none");
+
+                          var totalLength2 = path2.node().getTotalLength();
+
+                          path2.attr("stroke-dasharray", totalLength2 + " " + totalLength2)
+                             .attr("stroke-dashoffset", totalLength2)
+                             .transition()
+                             .duration(transition_load)
+                             .ease(d3.easeLinear)
+                             .attr("stroke-dashoffset", 2);
+
+                          svgContainer.selectAll("circle")
+                             .data(ref_data2_1)
+                             .enter()
+                             .append('circle')
+                             .attr("class", "circle3")
+                             .attr('r', 3)
+                             .attr("cx", function (d) { return +xAxisScale(d.year); })
+                             .attr("cy", function (d) { return +yAxisScale2(d.value); })
+                             .style("fill","#6dccda");
+
+                         label1 = svgContainer.append("text")
+                                          .attr("text-anchor", "middle")
+                                          .attr("transform", "translate("+ (w - padding/2 - 140) +","+(h/15)+")")
+                                          .attr('class', 'y_label')
+                                          .text("Construction")
+                                          .style("fill","#6dccda");
+
+                          //industry_information_percent
+                          var path2 = svgContainer.append("path")
+                                        .attr("class", "line2")
+                                        .attr("d", line2(ref_data2_2))
+                                        .attr("stroke", "#cdcc5d")
+                                        .attr("stroke-width", 2)
+                                        .attr("fill", "none");
+
+                          var totalLength2 = path2.node().getTotalLength();
+
+                           path2.attr("stroke-dasharray", totalLength2 + " " + totalLength2)
+                              .attr("stroke-dashoffset", totalLength2)
+                              .transition()
+                              .duration(transition_load)
+                              .ease(d3.easeLinear)
+                              .attr("stroke-dashoffset", 2);
+
+                           svgContainer.selectAll("circle3")
+                              .data(ref_data2_2)
+                              .enter()
+                              .append('circle')
+                              .attr("class", "circle3")
+                              .attr('r', 3)
+                              .attr("cx", function (d) { return +xAxisScale(d.year); })
+                              .attr("cy", function (d) { return +yAxisScale2(d.value); })
+                              .style("fill","#cdcc5d");
+
+                          label2 = svgContainer.append("text")
+                                           .attr("text-anchor", "middle")
+                                           .attr("transform", "translate("+ (w - padding/2 - 140) +","+(h/15 + 30)+")")
+                                           .attr('class', 'y_label')
+                                           .text("Information")
+                                           .style("fill","#cdcc5d");
+
+                          //industry_manufacturing_percent
+                          var path2 = svgContainer.append("path")
+                                        .attr("class", "line2")
+                                        .attr("d", line2(ref_data2_3))
+                                        .attr("stroke", "#a2a2a2")
+                                        .attr("stroke-width", 2)
+                                        .attr("fill", "none");
+
+                           var totalLength2 = path2.node().getTotalLength();
+
+                           path2.attr("stroke-dasharray", totalLength2 + " " + totalLength2)
+                              .attr("stroke-dashoffset", totalLength2)
+                              .transition()
+                              .duration(transition_load)
+                              .ease(d3.easeLinear)
+                              .attr("stroke-dashoffset", 2);
+
+                           svgContainer.selectAll("circle3")
+                              .data(ref_data2_3)
+                              .enter()
+                              .append('circle')
+                              .attr("class", "circle3")
+                              .attr('r', 3)
+                              .attr("cx", function (d) { return +xAxisScale(d.year); })
+                              .attr("cy", function (d) { return +yAxisScale2(d.value); })
+                              .style("fill","#a2a2a2");
+
+                          label3 = svgContainer.append("text")
+                                           .attr("text-anchor", "middle")
+                                           .attr("transform", "translate("+ (w - padding/2 - 140) +","+(h/15 + 60)+")")
+                                           .attr('class', 'y_label')
+                                           .text("Manufacturing")
+                                           .style("fill","#a2a2a2");
+
+                          //industry_nondurable_percent
+                          var path2 = svgContainer.append("path")
+                                        .attr("class", "line2")
+                                        .attr("d", line2(ref_data2_4))
+                                        .attr("stroke", "#ed97ca")
+                                        .attr("stroke-width", 2)
+                                        .attr("fill", "none");
+
+                           var totalLength2 = path2.node().getTotalLength();
+
+                           path2.attr("stroke-dasharray", totalLength2 + " " + totalLength2)
+                              .attr("stroke-dashoffset", totalLength2)
+                              .transition()
+                              .duration(transition_load)
+                              .ease(d3.easeLinear)
+                              .attr("stroke-dashoffset", 2);
+
+                           svgContainer.selectAll("circle3")
+                              .data(ref_data2_4)
+                              .enter()
+                              .append('circle')
+                              .attr("class", "circle3")
+                              .attr('r', 3)
+                              .attr("cx", function (d) { return +xAxisScale(d.year); })
+                              .attr("cy", function (d) { return +yAxisScale2(d.value); })
+                              .style("fill","#ed97ca");
+
+                          label4 = svgContainer.append("text")
+                                           .attr("text-anchor", "middle")
+                                           .attr("transform", "translate("+ (w - padding/2 - 140) +","+(h/15 + 90)+")")
+                                           .attr('class', 'y_label')
+                                           .text("Non Durable Goods")
+                                           .style("fill","#ed97ca");
+
+                          //industry_professional_percent
+                          var path2 = svgContainer.append("path")
+                                        .attr("class", "line2")
+                                        .attr("d", line2(ref_data2_5))
+                                        .attr("stroke", "#a8786e")
+                                        .attr("stroke-width", 2)
+                                        .attr("fill", "none");
+
+                           var totalLength2 = path2.node().getTotalLength();
+
+                           path2.attr("stroke-dasharray", totalLength2 + " " + totalLength2)
+                              .attr("stroke-dashoffset", totalLength2)
+                              .transition()
+                              .duration(transition_load)
+                              .ease(d3.easeLinear)
+                              .attr("stroke-dashoffset", 2);
+
+                           svgContainer.selectAll("circle3")
+                              .data(ref_data2_5)
+                              .enter()
+                              .append('circle')
+                              .attr("class", "circle3")
+                              .attr('r', 3)
+                              .attr("cx", function (d) { return +xAxisScale(d.year); })
+                              .attr("cy", function (d) { return +yAxisScale2(d.value); })
+                              .style("fill","#a8786e");
+
+                          label5 = svgContainer.append("text")
+                                           .attr("text-anchor", "middle")
+                                           .attr("transform", "translate("+ (w - padding/2 - 140) +","+(h/15 +120)+")")
+                                           .attr('class', 'y_label')
+                                           .text("Professional and Business Services")
+                                           .style("fill","#a8786e");
+
+                          d3.selectAll(".line2")
+                                     		 .style("filter","url(#glow)");
+
+                      });
+        unemployVSForm.append('label').html('Industry Type ');
+
+        unemployVSForm.append('input')
+                       .attr('type', 'radio')
+                       .attr('value', 'none')
+                       .attr('id', 'vs_industry_change')
+                       .attr('name', 'radunemployVS')
+                       .attr('disabled', 'disabled')
+                       .on('click', function () {
+                         d3.selectAll('.line1').remove();
+                         d3.selectAll('.line2').remove();
+                         d3.selectAll('.circle1').remove();
+                         d3.selectAll('.circle2').remove();
+                         d3.selectAll('.circle3').remove();
+                         d3.selectAll('.y_axis1').remove();
+                         d3.selectAll('.y_text1').remove();
+                         d3.selectAll('.y_axis2').remove();
+                         d3.selectAll('.y_text2').remove();
+                         d3.selectAll('.y_label').remove();
+                         d3.selectAll('.heading').remove();
+
+                         window.clearTimeout(transition_obj);
+                         transition_obj = window.setTimeout(function(){
+                           document.getElementById('vs_gender').click();
+                         }, transition_delay);
+
+                         left_column2_1 = 'industry_construction_change_percent';
+                         left_column2_2 = 'industry_information_change_percent';
+                         left_column2_3 = 'industry_manufacturing_change_percent';
+                         left_column2_4 = 'industry_nondurable_change_percent';
+                         left_column2_5 = 'industry_professional_change_percent';
+
+                         l1 = Object.values(vals[left_column2_1]);
+                         l2 = Object.values(vals[left_column2_2]);
+                         l3 = Object.values(vals[left_column2_3]);
+                         l4 = Object.values(vals[left_column2_4]);
+                         l5 = Object.values(vals[left_column2_5]);
+
+                         ref_data2_1 = l1.map( function(item, i) {
+                                        return {"value": item, "year": dateParser(bottom_column_x[i])};
+                            });
+
+                         ref_data2_2 = l2.map( function(item, i) {
+                                        return {"value": item, "year": dateParser(bottom_column_x[i])};
+                           });
+
+                         ref_data2_3 = l3.map( function(item, i) {
+                                        return {"value": item, "year": dateParser(bottom_column_x[i])};
+                           });
+
+                         ref_data2_4 = l4.map( function(item, i) {
+                                        return {"value": item, "year": dateParser(bottom_column_x[i])};
+                           });
+
+                         ref_data2_5 = l5.map( function(item, i) {
+                                        return {"value": item, "year": dateParser(bottom_column_x[i])};
+                             });
+
+                         y2Min = -40.0;
+                         y2Max = 120.0;
+
+                         var yAxisScale2 = d3.scaleLinear()
+                                            .domain([y2Max, y2Min])
+                                            .range([padding, h - padding])
+                                            .nice();
+
+                         var yAxis2 = d3.axisLeft()
+                                            .scale(yAxisScale2)
+                                            .tickSize(10);
+
+                         svgContainer.append('g')
+                                    .attr('transform', 'translate('+ (padding) + ', ' + 0 + ')')
+                                    .attr('class', 'y_axis1')
+                                    .classed('y axis', true)
+                                    .call(yAxis2);
+
+                         svgContainer.append("text")
+                                    .attr("text-anchor", "middle")
+                                    .attr("transform", "translate("+ (padding/2 - 15) +","+(h/2)+")rotate(-90)")
+                                    .attr('class', 'y_text1')
+                                    .text("Change in Unemployment Rate (Year over Year)")
+                                    .style("font-size", "26px").style("font","sans-serif").style("fill","blue");
+
+                        heading = svgContainer.append("text")
+                                         .attr("text-anchor", "middle")
+                                         .attr("transform", "translate("+ (w/2) +","+(padding / 3)+")")
+                                         .attr('class', 'heading')
+                                         .text("Change in Unemployment Rate (YOY) for various industries (2003 - 2016)");
+
+                         var line2 = d3.line()
+                                    .x(function(d) { return +xAxisScale(d.year); })
+                                    .y(function(d) { return +yAxisScale2(d.value); });
+
+                         //industry_construction_change_percent
+                         var path2 = svgContainer.append("path")
+                                      .attr("class", "line2")
+                                      .attr("d", line2(ref_data2_1))
+                                      .attr("stroke", "#6dccda")
+                                      .attr("stroke-width", 2)
+                                      .attr("fill", "none");
+
+                         var totalLength2 = path2.node().getTotalLength();
+
+                         path2.attr("stroke-dasharray", totalLength2 + " " + totalLength2)
+                            .attr("stroke-dashoffset", totalLength2)
+                            .transition()
+                            .duration(transition_load)
+                            .ease(d3.easeLinear)
+                            .attr("stroke-dashoffset", 2);
+
+                         svgContainer.selectAll("circle")
+                            .data(ref_data2_1)
+                            .enter()
+                            .append('circle')
+                            .attr("class", "circle3")
+                            .attr('r', 3)
+                            .attr("cx", function (d) { return +xAxisScale(d.year); })
+                            .attr("cy", function (d) { return +yAxisScale2(d.value); })
+                            .style("fill","#6dccda");
+
+                        label1 = svgContainer.append("text")
+                                         .attr("text-anchor", "middle")
+                                         .attr("transform", "translate("+ (w - padding/2 - 140) +","+(h/15)+")")
+                                         .attr('class', 'y_label')
+                                         .text("Construction")
+                                         .style("fill","#6dccda");
+
+                         //industry_information_change_percent
+                         var path2 = svgContainer.append("path")
+                                       .attr("class", "line2")
+                                       .attr("d", line2(ref_data2_2))
+                                       .attr("stroke", "#cdcc5d")
+                                       .attr("stroke-width", 2)
+                                       .attr("fill", "none");
+
+                         var totalLength2 = path2.node().getTotalLength();
+
+                          path2.attr("stroke-dasharray", totalLength2 + " " + totalLength2)
+                             .attr("stroke-dashoffset", totalLength2)
+                             .transition()
+                             .duration(transition_load)
+                             .ease(d3.easeLinear)
+                             .attr("stroke-dashoffset", 2);
+
+                          svgContainer.selectAll("circle3")
+                             .data(ref_data2_2)
+                             .enter()
+                             .append('circle')
+                             .attr("class", "circle3")
+                             .attr('r', 3)
+                             .attr("cx", function (d) { return +xAxisScale(d.year); })
+                             .attr("cy", function (d) { return +yAxisScale2(d.value); })
+                             .style("fill","#cdcc5d");
+
+                         label2 = svgContainer.append("text")
+                                          .attr("text-anchor", "middle")
+                                          .attr("transform", "translate("+ (w - padding/2 - 140) +","+(h/15 + 30)+")")
+                                          .attr('class', 'y_label')
+                                          .text("Information")
+                                          .style("fill","#cdcc5d");
+
+                         //industry_manufacturing_change_percent
+                         var path2 = svgContainer.append("path")
+                                       .attr("class", "line2")
+                                       .attr("d", line2(ref_data2_3))
+                                       .attr("stroke", "#a2a2a2")
+                                       .attr("stroke-width", 2)
+                                       .attr("fill", "none");
+
+                          var totalLength2 = path2.node().getTotalLength();
+
+                          path2.attr("stroke-dasharray", totalLength2 + " " + totalLength2)
+                             .attr("stroke-dashoffset", totalLength2)
+                             .transition()
+                             .duration(transition_load)
+                             .ease(d3.easeLinear)
+                             .attr("stroke-dashoffset", 2);
+
+                          svgContainer.selectAll("circle3")
+                             .data(ref_data2_3)
+                             .enter()
+                             .append('circle')
+                             .attr("class", "circle3")
+                             .attr('r', 3)
+                             .attr("cx", function (d) { return +xAxisScale(d.year); })
+                             .attr("cy", function (d) { return +yAxisScale2(d.value); })
+                             .style("fill","#a2a2a2");
+
+                         label3 = svgContainer.append("text")
+                                          .attr("text-anchor", "middle")
+                                          .attr("transform", "translate("+ (w - padding/2 - 140) +","+(h/15 + 60)+")")
+                                          .attr('class', 'y_label')
+                                          .text("Manufacturing")
+                                          .style("fill","#a2a2a2");
+
+                         //industry_nondurable_change_percent
+                         var path2 = svgContainer.append("path")
+                                       .attr("class", "line2")
+                                       .attr("d", line2(ref_data2_4))
+                                       .attr("stroke", "#ed97ca")
+                                       .attr("stroke-width", 2)
+                                       .attr("fill", "none");
+
+                          var totalLength2 = path2.node().getTotalLength();
+
+                          path2.attr("stroke-dasharray", totalLength2 + " " + totalLength2)
+                             .attr("stroke-dashoffset", totalLength2)
+                             .transition()
+                             .duration(transition_load)
+                             .ease(d3.easeLinear)
+                             .attr("stroke-dashoffset", 2);
+
+                          svgContainer.selectAll("circle3")
+                             .data(ref_data2_4)
+                             .enter()
+                             .append('circle')
+                             .attr("class", "circle3")
+                             .attr('r', 3)
+                             .attr("cx", function (d) { return +xAxisScale(d.year); })
+                             .attr("cy", function (d) { return +yAxisScale2(d.value); })
+                             .style("fill","#ed97ca");
+
+                         label4 = svgContainer.append("text")
+                                          .attr("text-anchor", "middle")
+                                          .attr("transform", "translate("+ (w - padding/2 - 140) +","+(h/15 + 90)+")")
+                                          .attr('class', 'y_label')
+                                          .text("Non Durable Goods")
+                                          .style("fill","#ed97ca");
+
+                         //industry_professional_change_percent
+                         var path2 = svgContainer.append("path")
+                                       .attr("class", "line2")
+                                       .attr("d", line2(ref_data2_5))
+                                       .attr("stroke", "#a8786e")
+                                       .attr("stroke-width", 2)
+                                       .attr("fill", "none");
+
+                          var totalLength2 = path2.node().getTotalLength();
+
+                          path2.attr("stroke-dasharray", totalLength2 + " " + totalLength2)
+                             .attr("stroke-dashoffset", totalLength2)
+                             .transition()
+                             .duration(transition_load)
+                             .ease(d3.easeLinear)
+                             .attr("stroke-dashoffset", 2);
+
+                          svgContainer.selectAll("circle3")
+                             .data(ref_data2_5)
+                             .enter()
+                             .append('circle')
+                             .attr("class", "circle3")
+                             .attr('r', 3)
+                             .attr("cx", function (d) { return +xAxisScale(d.year); })
+                             .attr("cy", function (d) { return +yAxisScale2(d.value); })
+                             .style("fill","#a8786e");
+
+                         label5 = svgContainer.append("text")
+                                          .attr("text-anchor", "middle")
+                                          .attr("transform", "translate("+ (w - padding/2 - 140) +","+(h/15 + 120)+")")
+                                          .attr('class', 'y_label')
+                                          .text("Professional and Business Services")
+                                          .style("fill","#a8786e");
+
+                        d3.selectAll(".line2")
+                                   		   .style("filter","url(#glow)");
+
+                      });
+        unemployVSForm.append('label').html('Industry Type (Percentage Change) ');
+
+        //Gender start
+        unemployVSForm.append('input')
+                       .attr('type', 'radio')
+                       .attr('value', 'none')
+                       .attr('id', 'vs_gender')
+                       .attr('name', 'radunemployVS')
+                       .attr('disabled', 'disabled')
+                       .on('click', function () {
+                          d3.selectAll('.line1').remove();
+                          d3.selectAll('.line2').remove();
+                          d3.selectAll('.circle1').remove();
+                          d3.selectAll('.circle2').remove();
+                          d3.selectAll('.circle3').remove();
+                          d3.selectAll('.y_axis1').remove();
+                          d3.selectAll('.y_text1').remove();
+                          d3.selectAll('.y_axis2').remove();
+                          d3.selectAll('.y_text2').remove();
+                          d3.selectAll('.y_label').remove();
+                          d3.selectAll('.heading').remove();
+
+                          window.clearTimeout(transition_obj);
+                          transition_obj = window.setTimeout(function(){
+                            document.getElementById('vs_gender_change').click();
+                          }, transition_delay);
+
+                          left_column2_1 = 'gender_male_percent';
+                          left_column2_2 = 'gender_female_percent';
+
+                          l1 = Object.values(vals[left_column2_1]);
+                          l2 = Object.values(vals[left_column2_2]);
+
+                          ref_data2_1 = l1.map( function(item, i) {
+                                        return {"value": item, "year": dateParser(bottom_column_x[i])};
+                             });
+
+                          ref_data2_2 = l2.map( function(item, i) {
+                                        return {"value": item, "year": dateParser(bottom_column_x[i])};
+                            });
+
+                          y2Min = 0.0;
+                          y2Max = 12.0;
+
+                          var yAxisScale2 = d3.scaleLinear()
+                                             .domain([y2Max, y2Min])
+                                             .range([padding, h - padding])
+                                             .nice();
+
+                          var yAxis2 = d3.axisLeft()
+                                             .scale(yAxisScale2)
+                                             .tickSize(10);
+
+                          svgContainer.append('g')
+                                     .attr('transform', 'translate('+ (padding) + ', ' + 0 + ')')
+                                     .attr('class', 'y_axis1')
+                                     .classed('y axis', true)
+                                     .call(yAxis2);
+
+                          svgContainer.append("text")
+                                     .attr("text-anchor", "middle")
+                                     .attr("transform", "translate("+ (padding/2 - 15) +","+(h/2)+")rotate(-90)")
+                                     .attr('class', 'y_text1')
+                                     .text("Unemployment Rate (% of total labor force)")
+                                     .style("font-size", "26px").style("font","sans-serif").style("fill","blue");
+
+                         heading = svgContainer.append("text")
+                                          .attr("text-anchor", "middle")
+                                          .attr("transform", "translate("+ (w/2) +","+(padding / 3)+")")
+                                          .attr('class', 'heading')
+                                          .text("Unemployment Rate for Men and Women (2003 - 2016)");
+
+                          var line2 = d3.line()
+                                     .x(function(d) { return +xAxisScale(d.year); })
+                                     .y(function(d) { return +yAxisScale2(d.value); });
+
+                          //male
+                          var path2 = svgContainer.append("path")
+                                       .attr("class", "line2")
+                                       .attr("d", line2(ref_data2_1))
+                                       .attr("stroke", "#6dccda")
+                                       .attr("stroke-width", 2)
+                                       .attr("fill", "none");
+
+                          var totalLength2 = path2.node().getTotalLength();
+
+                          path2.attr("stroke-dasharray", totalLength2 + " " + totalLength2)
+                             .attr("stroke-dashoffset", totalLength2)
+                             .transition()
+                             .duration(transition_load)
+                             .ease(d3.easeLinear)
+                             .attr("stroke-dashoffset", 2);
+
+                          svgContainer.selectAll("circle")
+                             .data(ref_data2_1)
+                             .enter()
+                             .append('circle')
+                             .attr("class", "circle3")
+                             .attr('r', 3)
+                             .attr("cx", function (d) { return +xAxisScale(d.year); })
+                             .attr("cy", function (d) { return +yAxisScale2(d.value); })
+                             .style("fill","#6dccda");
+
+                          label1 = svgContainer.append("text")
+                                               .attr("text-anchor", "middle")
+                                               .attr("transform", "translate("+ (w/2 - 100) +","+(padding / 3 + 30)+")")
+                                               .attr('class', 'y_label')
+                                               .text("Men")
+                                               .style("fill","#6dccda");
+
+                          //female
+                          var path2 = svgContainer.append("path")
+                                        .attr("class", "line2")
+                                        .attr("d", line2(ref_data2_2))
+                                        .attr("stroke", "#cdcc5d")
+                                        .attr("stroke-width", 2)
+                                        .attr("fill", "none");
+
+                          var totalLength2 = path2.node().getTotalLength();
+
+                          path2.attr("stroke-dasharray", totalLength2 + " " + totalLength2)
+                            .attr("stroke-dashoffset", totalLength2)
+                            .transition()
+                            .duration(transition_load)
+                            .ease(d3.easeLinear)
+                            .attr("stroke-dashoffset", 2);
+
+                          svgContainer.selectAll("circle3")
+                            .data(ref_data2_2)
+                            .enter()
+                            .append('circle')
+                            .attr("class", "circle3")
+                            .attr('r', 3)
+                            .attr("cx", function (d) { return +xAxisScale(d.year); })
+                            .attr("cy", function (d) { return +yAxisScale2(d.value); })
+                            .style("fill","#cdcc5d");
+
+                          label2 = svgContainer.append("text")
+                                                .attr("text-anchor", "middle")
+                                                .attr("transform", "translate("+ (w/2 + 100) +","+(padding / 3 + 30)+")")
+                                                .attr('class', 'y_label')
+                                                .text("Women")
+                                                .style("fill","#cdcc5d");
+
+                          d3.selectAll(".line2")
+                            .style("filter","url(#glow)");
+
+                      });
+        unemployVSForm.append('label').html('Gender ');
+        //Gender ended
+
+        //Gender change start
+        unemployVSForm.append('input')
+                       .attr('type', 'radio')
+                       .attr('value', 'none')
+                       .attr('id', 'vs_gender_change')
+                       .attr('name', 'radunemployVS')
+                       .attr('disabled', 'disabled')
+                       .on('click', function () {
+                          d3.selectAll('.line1').remove();
+                          d3.selectAll('.line2').remove();
+                          d3.selectAll('.circle1').remove();
+                          d3.selectAll('.circle2').remove();
+                          d3.selectAll('.circle3').remove();
+                          d3.selectAll('.y_axis1').remove();
+                          d3.selectAll('.y_text1').remove();
+                          d3.selectAll('.y_axis2').remove();
+                          d3.selectAll('.y_text2').remove();
+                          d3.selectAll('.y_label').remove();
+                          d3.selectAll('.heading').remove();
+
+                          window.clearTimeout(transition_obj);
+                          transition_obj = window.setTimeout(function(){
+                            document.getElementById('vs_race').click();
+                          }, transition_delay);
+
+                          left_column2_1 = 'gender_male_change_percent';
+                          left_column2_2 = 'gender_female_change_percent';
+
+                          l1 = Object.values(vals[left_column2_1]);
+                          l2 = Object.values(vals[left_column2_2]);
+
+                          ref_data2_1 = l1.map( function(item, i) {
+                                        return {"value": item, "year": dateParser(bottom_column_x[i])};
+                             });
+
+                          ref_data2_2 = l2.map( function(item, i) {
+                                        return {"value": item, "year": dateParser(bottom_column_x[i])};
+                            });
+
+                          y2Min = -20.0;
+                          y2Max = 80.0;
+
+                          var yAxisScale2 = d3.scaleLinear()
+                                             .domain([y2Max, y2Min])
+                                             .range([padding, h - padding])
+                                             .nice();
+
+                          var yAxis2 = d3.axisLeft()
+                                             .scale(yAxisScale2)
+                                             .tickSize(10);
+
+                          svgContainer.append('g')
+                                     .attr('transform', 'translate('+ (padding) + ', ' + 0 + ')')
+                                     .attr('class', 'y_axis1')
+                                     .classed('y axis', true)
+                                     .call(yAxis2);
+
+                          svgContainer.append("text")
+                                     .attr("text-anchor", "middle")
+                                     .attr("transform", "translate("+ (padding/2 - 15) +","+(h/2)+")rotate(-90)")
+                                     .attr('class', 'y_text1')
+                                     .text("Change in Unemployment Rate (Year over Year)")
+                                     .style("font-size", "26px").style("font","sans-serif").style("fill","blue");
+
+                         heading = svgContainer.append("text")
+                                          .attr("text-anchor", "middle")
+                                          .attr("transform", "translate("+ (w/2) +","+(padding / 3)+")")
+                                          .attr('class', 'heading')
+                                          .text("Change in Unemployment Rate (YOY) for Men and Women (2003 - 2016)");
+
+                          var line2 = d3.line()
+                                     .x(function(d) { return +xAxisScale(d.year); })
+                                     .y(function(d) { return +yAxisScale2(d.value); });
+
+                          //male
+                          var path2 = svgContainer.append("path")
+                                       .attr("class", "line2")
+                                       .attr("d", line2(ref_data2_1))
+                                       .attr("stroke", "#6dccda")
+                                       .attr("stroke-width", 2)
+                                       .attr("fill", "none");
+
+                          var totalLength2 = path2.node().getTotalLength();
+
+                          path2.attr("stroke-dasharray", totalLength2 + " " + totalLength2)
+                             .attr("stroke-dashoffset", totalLength2)
+                             .transition()
+                             .duration(transition_load)
+                             .ease(d3.easeLinear)
+                             .attr("stroke-dashoffset", 2);
+
+                          svgContainer.selectAll("circle")
+                             .data(ref_data2_1)
+                             .enter()
+                             .append('circle')
+                             .attr("class", "circle3")
+                             .attr('r', 3)
+                             .attr("cx", function (d) { return +xAxisScale(d.year); })
+                             .attr("cy", function (d) { return +yAxisScale2(d.value); })
+                             .style("fill","#6dccda");
+
+                          label1 = svgContainer.append("text")
+                                               .attr("text-anchor", "middle")
+                                               .attr("transform", "translate("+ (w/2 - 100) +","+(padding / 3 + 30)+")")
+                                               .attr('class', 'y_label')
+                                               .text("Men")
+                                               .style("fill","#6dccda");
+
+                          //female
+                          var path2 = svgContainer.append("path")
+                                        .attr("class", "line2")
+                                        .attr("d", line2(ref_data2_2))
+                                        .attr("stroke", "#cdcc5d")
+                                        .attr("stroke-width", 2)
+                                        .attr("fill", "none");
+
+                          var totalLength2 = path2.node().getTotalLength();
+
+                          path2.attr("stroke-dasharray", totalLength2 + " " + totalLength2)
+                            .attr("stroke-dashoffset", totalLength2)
+                            .transition()
+                            .duration(transition_load)
+                            .ease(d3.easeLinear)
+                            .attr("stroke-dashoffset", 2);
+
+                          svgContainer.selectAll("circle3")
+                            .data(ref_data2_2)
+                            .enter()
+                            .append('circle')
+                            .attr("class", "circle3")
+                            .attr('r', 3)
+                            .attr("cx", function (d) { return +xAxisScale(d.year); })
+                            .attr("cy", function (d) { return +yAxisScale2(d.value); })
+                            .style("fill","#cdcc5d");
+
+                          label2 = svgContainer.append("text")
+                                                .attr("text-anchor", "middle")
+                                                .attr("transform", "translate("+ (w/2 + 100) +","+(padding / 3 + 30)+")")
+                                                .attr('class', 'y_label')
+                                                .text("Women")
+                                                .style("fill","#cdcc5d");
+
+                          d3.selectAll(".line2")
+                            .style("filter","url(#glow)");
+
+                      });
+        unemployVSForm.append('label').html('Gender (Percentage Change) ');
+        //Gender change ended
+
+        //Race start
+        unemployVSForm.append('input')
+                       .attr('type', 'radio')
+                       .attr('value', 'none')
+                       .attr('id', 'vs_race')
+                       .attr('name', 'radunemployVS')
+                       .attr('disabled', 'disabled')
+                       .on('click', function () {
+                          d3.selectAll('.line1').remove();
+                          d3.selectAll('.line2').remove();
+                          d3.selectAll('.circle1').remove();
+                          d3.selectAll('.circle2').remove();
+                          d3.selectAll('.circle3').remove();
+                          d3.selectAll('.y_axis1').remove();
+                          d3.selectAll('.y_text1').remove();
+                          d3.selectAll('.y_axis2').remove();
+                          d3.selectAll('.y_text2').remove();
+                          d3.selectAll('.y_label').remove();
+                          d3.selectAll('.heading').remove();
+
+                          window.clearTimeout(transition_obj);
+                          transition_obj = window.setTimeout(function(){
+                            document.getElementById('vs_race_change').click();
+                          }, transition_delay);
+
+                          left_column2_1 = 'race_asian_percent';
+                          left_column2_2 = 'race_black_percent';
+                          left_column2_3 = 'race_hispanic_percent';
+                          left_column2_4 = 'race_white_percent';
+
+                          l1 = Object.values(vals[left_column2_1]);
+                          l2 = Object.values(vals[left_column2_2]);
+                          l3 = Object.values(vals[left_column2_3]);
+                          l4 = Object.values(vals[left_column2_4]);
+
+                          ref_data2_1 = l1.map( function(item, i) {
+                                        return {"value": item, "year": dateParser(bottom_column_x[i])};
+                             });
+
+                          ref_data2_2 = l2.map( function(item, i) {
+                                        return {"value": item, "year": dateParser(bottom_column_x[i])};
+                            });
+
+                          ref_data2_3 = l3.map( function(item, i) {
+                                        return {"value": item, "year": dateParser(bottom_column_x[i])};
+                            });
+
+                          ref_data2_4 = l4.map( function(item, i) {
+                                        return {"value": item, "year": dateParser(bottom_column_x[i])};
+                            });
+
+                          y2Min = 0.0;
+                          y2Max = 20.0;
+
+                          var yAxisScale2 = d3.scaleLinear()
+                                             .domain([y2Max, y2Min])
+                                             .range([padding, h - padding])
+                                             .nice();
+
+                          var yAxis2 = d3.axisLeft()
+                                             .scale(yAxisScale2)
+                                             .tickSize(10);
+
+                          svgContainer.append('g')
+                                     .attr('transform', 'translate('+ (padding) + ', ' + 0 + ')')
+                                     .attr('class', 'y_axis1')
+                                     .classed('y axis', true)
+                                     .call(yAxis2);
+
+                          svgContainer.append("text")
+                                     .attr("text-anchor", "middle")
+                                     .attr("transform", "translate("+ (padding/2 - 15) +","+(h/2)+")rotate(-90)")
+                                     .attr('class', 'y_text1')
+                                     .text("Unemployment Rate (% of total labor force)")
+                                     .style("font-size", "26px").style("font","sans-serif").style("fill","blue");
+
+                         heading = svgContainer.append("text")
+                                          .attr("text-anchor", "middle")
+                                          .attr("transform", "translate("+ (w/2) +","+(padding / 3)+")")
+                                          .attr('class', 'heading')
+                                          .text("Unemployment Rate for various industries (2006 - 2016)");
+
+                          var line2 = d3.line()
+                                     .x(function(d) { return +xAxisScale(d.year); })
+                                     .y(function(d) { return +yAxisScale2(d.value); });
+
+                          //race_asian_percent
+                          var path2 = svgContainer.append("path")
+                                       .attr("class", "line2")
+                                       .attr("d", line2(ref_data2_1))
+                                       .attr("stroke", "#6dccda")
+                                       .attr("stroke-width", 2)
+                                       .attr("fill", "none");
+
+                          var totalLength2 = path2.node().getTotalLength();
+
+                          path2.attr("stroke-dasharray", totalLength2 + " " + totalLength2)
+                             .attr("stroke-dashoffset", totalLength2)
+                             .transition()
+                             .duration(transition_load)
+                             .ease(d3.easeLinear)
+                             .attr("stroke-dashoffset", 2);
+
+                          svgContainer.selectAll("circle")
+                             .data(ref_data2_1)
+                             .enter()
+                             .append('circle')
+                             .attr("class", "circle3")
+                             .attr('r', 3)
+                             .attr("cx", function (d) { return +xAxisScale(d.year); })
+                             .attr("cy", function (d) { return +yAxisScale2(d.value); })
+                             .style("fill","#6dccda");
+
+                         label1 = svgContainer.append("text")
+                                               .attr("text-anchor", "middle")
+                                               .attr("transform", "translate("+ (w/2 - 400) +","+(padding / 3 + 30)+")")
+                                               .attr('class', 'y_label')
+                                               .text("Asian")
+                                               .style("fill","#6dccda");
+
+                          //race_black_percent
+                          var path2 = svgContainer.append("path")
+                                        .attr("class", "line2")
+                                        .attr("d", line2(ref_data2_2))
+                                        .attr("stroke", "#cdcc5d")
+                                        .attr("stroke-width", 2)
+                                        .attr("fill", "none");
+
+                          var totalLength2 = path2.node().getTotalLength();
+
+                           path2.attr("stroke-dasharray", totalLength2 + " " + totalLength2)
+                              .attr("stroke-dashoffset", totalLength2)
+                              .transition()
+                              .duration(transition_load)
+                              .ease(d3.easeLinear)
+                              .attr("stroke-dashoffset", 2);
+
+                           svgContainer.selectAll("circle3")
+                              .data(ref_data2_2)
+                              .enter()
+                              .append('circle')
+                              .attr("class", "circle3")
+                              .attr('r', 3)
+                              .attr("cx", function (d) { return +xAxisScale(d.year); })
+                              .attr("cy", function (d) { return +yAxisScale2(d.value); })
+                              .style("fill","#cdcc5d");
+
+                          label2 = svgContainer.append("text")
+                                                .attr("text-anchor", "middle")
+                                                .attr("transform", "translate("+ (w/2 - 200) +","+(padding / 3 + 30)+")")
+                                                .attr('class', 'y_label')
+                                                .text("Black or African American")
+                                                .style("fill","#cdcc5d");
+
+                          //race_hispanic_percent
+                          var path2 = svgContainer.append("path")
+                                        .attr("class", "line2")
+                                        .attr("d", line2(ref_data2_3))
+                                        .attr("stroke", "#a2a2a2")
+                                        .attr("stroke-width", 2)
+                                        .attr("fill", "none");
+
+                           var totalLength2 = path2.node().getTotalLength();
+
+                           path2.attr("stroke-dasharray", totalLength2 + " " + totalLength2)
+                              .attr("stroke-dashoffset", totalLength2)
+                              .transition()
+                              .duration(transition_load)
+                              .ease(d3.easeLinear)
+                              .attr("stroke-dashoffset", 2);
+
+                           svgContainer.selectAll("circle3")
+                              .data(ref_data2_3)
+                              .enter()
+                              .append('circle')
+                              .attr("class", "circle3")
+                              .attr('r', 3)
+                              .attr("cx", function (d) { return +xAxisScale(d.year); })
+                              .attr("cy", function (d) { return +yAxisScale2(d.value); })
+                              .style("fill","#a2a2a2");
+
+                          label3 = svgContainer.append("text")
+                                                .attr("text-anchor", "middle")
+                                                .attr("transform", "translate("+ (w/2 + 100) +","+(padding / 3 + 30)+")")
+                                                .attr('class', 'y_label')
+                                                .text("Hispanic or Latino")
+                                                .style("fill","#a2a2a2");
+
+                          //race_white_percent
+                          var path2 = svgContainer.append("path")
+                                        .attr("class", "line2")
+                                        .attr("d", line2(ref_data2_4))
+                                        .attr("stroke", "#ed97ca")
+                                        .attr("stroke-width", 2)
+                                        .attr("fill", "none");
+
+                           var totalLength2 = path2.node().getTotalLength();
+
+                           path2.attr("stroke-dasharray", totalLength2 + " " + totalLength2)
+                              .attr("stroke-dashoffset", totalLength2)
+                              .transition()
+                              .duration(transition_load)
+                              .ease(d3.easeLinear)
+                              .attr("stroke-dashoffset", 2);
+
+                           svgContainer.selectAll("circle3")
+                              .data(ref_data2_4)
+                              .enter()
+                              .append('circle')
+                              .attr("class", "circle3")
+                              .attr('r', 3)
+                              .attr("cx", function (d) { return +xAxisScale(d.year); })
+                              .attr("cy", function (d) { return +yAxisScale2(d.value); })
+                              .style("fill","#ed97ca");
+
+                          label4 = svgContainer.append("text")
+                                                .attr("text-anchor", "middle")
+                                                .attr("transform", "translate("+ (w/2 + 300) +","+(padding / 3 + 30)+")")
+                                                .attr('class', 'y_label')
+                                                .text("White")
+                                                .style("fill","#ed97ca");
+
+                          d3.selectAll(".line2")
+                                     		 .style("filter","url(#glow)");
+
+                      });
+        unemployVSForm.append('label').html('Race ');
+        //Race ended
+
+        //Race change start
+        unemployVSForm.append('input')
+                       .attr('type', 'radio')
+                       .attr('value', 'none')
+                       .attr('id', 'vs_race_change')
+                       .attr('name', 'radunemployVS')
+                       .attr('disabled', 'disabled')
+                       .on('click', function () {
+                         d3.selectAll('.line1').remove();
+                         d3.selectAll('.line2').remove();
+                         d3.selectAll('.circle1').remove();
+                         d3.selectAll('.circle2').remove();
+                         d3.selectAll('.circle3').remove();
+                         d3.selectAll('.y_axis1').remove();
+                         d3.selectAll('.y_text1').remove();
+                         d3.selectAll('.y_axis2').remove();
+                         d3.selectAll('.y_text2').remove();
+                         d3.selectAll('.y_label').remove();
+                         d3.selectAll('.heading').remove();
+
+                         window.clearTimeout(transition_obj);
+                         transition_obj = window.setTimeout(function(){
+                           document.getElementById('vs_none').click();
+                         }, transition_delay);
+
+                         left_column2_1 = 'race_asian_change_percent';
+                         left_column2_2 = 'race_black_change_percent';
+                         left_column2_3 = 'race_hispanic_change_percent';
+                         left_column2_4 = 'race_white_change_percent';
+
+                         l1 = Object.values(vals[left_column2_1]);
+                         l2 = Object.values(vals[left_column2_2]);
+                         l3 = Object.values(vals[left_column2_3]);
+                         l4 = Object.values(vals[left_column2_4]);
+
+                         ref_data2_1 = l1.map( function(item, i) {
+                                        return {"value": item, "year": dateParser(bottom_column_x[i])};
+                            });
+
+                         ref_data2_2 = l2.map( function(item, i) {
+                                        return {"value": item, "year": dateParser(bottom_column_x[i])};
+                           });
+
+                         ref_data2_3 = l3.map( function(item, i) {
+                                        return {"value": item, "year": dateParser(bottom_column_x[i])};
+                           });
+
+                         ref_data2_4 = l4.map( function(item, i) {
+                                        return {"value": item, "year": dateParser(bottom_column_x[i])};
+                           });
+
+                         y2Min = -30.0;
+                         y2Max = 90.0;
+
+                         var yAxisScale2 = d3.scaleLinear()
+                                            .domain([y2Max, y2Min])
+                                            .range([padding, h - padding])
+                                            .nice();
+
+                         var yAxis2 = d3.axisLeft()
+                                            .scale(yAxisScale2)
+                                            .tickSize(10);
+
+                         svgContainer.append('g')
+                                    .attr('transform', 'translate('+ (padding) + ', ' + 0 + ')')
+                                    .attr('class', 'y_axis1')
+                                    .classed('y axis', true)
+                                    .call(yAxis2);
+
+                         svgContainer.append("text")
+                                    .attr("text-anchor", "middle")
+                                    .attr("transform", "translate("+ (padding/2 - 15) +","+(h/2)+")rotate(-90)")
+                                    .attr('class', 'y_text1')
+                                    .text("Change in Unemployment Rate (Year over Year)")
+                                    .style("font-size", "26px").style("font","sans-serif").style("fill","blue");
+
+                        heading = svgContainer.append("text")
+                                         .attr("text-anchor", "middle")
+                                         .attr("transform", "translate("+ (w/2) +","+(padding / 3)+")")
+                                         .attr('class', 'heading')
+                                         .text("Change in Unemployment Rate (YOY) for various industries (2006 - 2016)");
+
+                         var line2 = d3.line()
+                                    .x(function(d) { return +xAxisScale(d.year); })
+                                    .y(function(d) { return +yAxisScale2(d.value); });
+
+                         //race_asian_change_percent
+                         var path2 = svgContainer.append("path")
+                                      .attr("class", "line2")
+                                      .attr("d", line2(ref_data2_1))
+                                      .attr("stroke", "#6dccda")
+                                      .attr("stroke-width", 2)
+                                      .attr("fill", "none");
+
+                         var totalLength2 = path2.node().getTotalLength();
+
+                         path2.attr("stroke-dasharray", totalLength2 + " " + totalLength2)
+                            .attr("stroke-dashoffset", totalLength2)
+                            .transition()
+                            .duration(transition_load)
+                            .ease(d3.easeLinear)
+                            .attr("stroke-dashoffset", 2);
+
+                         svgContainer.selectAll("circle")
+                            .data(ref_data2_1)
+                            .enter()
+                            .append('circle')
+                            .attr("class", "circle3")
+                            .attr('r', 3)
+                            .attr("cx", function (d) { return +xAxisScale(d.year); })
+                            .attr("cy", function (d) { return +yAxisScale2(d.value); })
+                            .style("fill","#6dccda");
+
+                        label1 = svgContainer.append("text")
+                                              .attr("text-anchor", "middle")
+                                              .attr("transform", "translate("+ (w/2 - 400) +","+(padding / 3 + 30)+")")
+                                              .attr('class', 'y_label')
+                                              .text("Asian")
+                                              .style("fill","#6dccda");
+
+                         //race_black_change_percent
+                         var path2 = svgContainer.append("path")
+                                       .attr("class", "line2")
+                                       .attr("d", line2(ref_data2_2))
+                                       .attr("stroke", "#cdcc5d")
+                                       .attr("stroke-width", 2)
+                                       .attr("fill", "none");
+
+                         var totalLength2 = path2.node().getTotalLength();
+
+                          path2.attr("stroke-dasharray", totalLength2 + " " + totalLength2)
+                             .attr("stroke-dashoffset", totalLength2)
+                             .transition()
+                             .duration(transition_load)
+                             .ease(d3.easeLinear)
+                             .attr("stroke-dashoffset", 2);
+
+                          svgContainer.selectAll("circle3")
+                             .data(ref_data2_2)
+                             .enter()
+                             .append('circle')
+                             .attr("class", "circle3")
+                             .attr('r', 3)
+                             .attr("cx", function (d) { return +xAxisScale(d.year); })
+                             .attr("cy", function (d) { return +yAxisScale2(d.value); })
+                             .style("fill","#cdcc5d");
+
+                         label2 = svgContainer.append("text")
+                                               .attr("text-anchor", "middle")
+                                               .attr("transform", "translate("+ (w/2 - 200) +","+(padding / 3 + 30)+")")
+                                               .attr('class', 'y_label')
+                                               .text("Black or African American")
+                                               .style("fill","#cdcc5d");
+
+                         //race_hispanic_change_percent
+                         var path2 = svgContainer.append("path")
+                                       .attr("class", "line2")
+                                       .attr("d", line2(ref_data2_3))
+                                       .attr("stroke", "#a2a2a2")
+                                       .attr("stroke-width", 2)
+                                       .attr("fill", "none");
+
+                          var totalLength2 = path2.node().getTotalLength();
+
+                          path2.attr("stroke-dasharray", totalLength2 + " " + totalLength2)
+                             .attr("stroke-dashoffset", totalLength2)
+                             .transition()
+                             .duration(transition_load)
+                             .ease(d3.easeLinear)
+                             .attr("stroke-dashoffset", 2);
+
+                          svgContainer.selectAll("circle3")
+                             .data(ref_data2_3)
+                             .enter()
+                             .append('circle')
+                             .attr("class", "circle3")
+                             .attr('r', 3)
+                             .attr("cx", function (d) { return +xAxisScale(d.year); })
+                             .attr("cy", function (d) { return +yAxisScale2(d.value); })
+                             .style("fill","#a2a2a2");
+
+                         label3 = svgContainer.append("text")
+                                               .attr("text-anchor", "middle")
+                                               .attr("transform", "translate("+ (w/2 + 100) +","+(padding / 3 + 30)+")")
+                                               .attr('class', 'y_label')
+                                               .text("Hispanic or Latino")
+                                               .style("fill","#a2a2a2");
+
+                         //race_white_change_percent
+                         var path2 = svgContainer.append("path")
+                                       .attr("class", "line2")
+                                       .attr("d", line2(ref_data2_4))
+                                       .attr("stroke", "#ed97ca")
+                                       .attr("stroke-width", 2)
+                                       .attr("fill", "none");
+
+                          var totalLength2 = path2.node().getTotalLength();
+
+                          path2.attr("stroke-dasharray", totalLength2 + " " + totalLength2)
+                             .attr("stroke-dashoffset", totalLength2)
+                             .transition()
+                             .duration(transition_load)
+                             .ease(d3.easeLinear)
+                             .attr("stroke-dashoffset", 2);
+
+                          svgContainer.selectAll("circle3")
+                             .data(ref_data2_4)
+                             .enter()
+                             .append('circle')
+                             .attr("class", "circle3")
+                             .attr('r', 3)
+                             .attr("cx", function (d) { return +xAxisScale(d.year); })
+                             .attr("cy", function (d) { return +yAxisScale2(d.value); })
+                             .style("fill","#ed97ca");
+
+                         label4 = svgContainer.append("text")
+                                               .attr("text-anchor", "middle")
+                                               .attr("transform", "translate("+ (w/2 + 300) +","+(padding / 3 + 30)+")")
+                                               .attr('class', 'y_label')
+                                               .text("White")
+                                               .style("fill","#ed97ca");
+
+                         d3.selectAll(".line2")
+                                   		   .style("filter","url(#glow)");
+
+                      });
+        unemployVSForm.append('label').html('Race (Percentage Change) ');
+        //Race change ended
+    });
+
+  </script>
+
+</body>
+</html>
