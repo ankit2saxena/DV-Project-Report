@@ -16,4 +16,5 @@ http://nbviewer.jupyter.org/github/shailendrapatil92/Data-Visualization/blob/mas
 
 ## Packages Used in this project: 
 Python: matplotlib, seaborn, plotly, pandas, cufflinks
+<br/>
 d3, Tableau
