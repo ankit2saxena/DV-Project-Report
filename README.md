@@ -7,15 +7,12 @@ https://ankit2saxena.github.io/DV-Project-Report/
 
 ## To view the plotly visualizations, please open the following links:
 ### Consolidated View:
-<br>
 http://nbviewer.jupyter.org/github/shailendrapatil92/Data-Visualization/blob/master/all_visualizations.ipynb
 
 ### Mid-term:
-<br>
 http://nbviewer.jupyter.org/github/shailendrapatil92/Data-Visualization/blob/master/dataviz_finals.ipynb
 
 ### Final-term:
-<br>
 http://nbviewer.jupyter.org/github/shailendrapatil92/Data-Visualization/blob/master/unemployment_visualization.ipynb
 
 ## Packages Used in this project: 
