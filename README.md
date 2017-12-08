@@ -6,7 +6,6 @@ Data Visualization Project Report: Causal effect of the Great Recession on Unemp
 https://ankit2saxena.github.io/DV-Project-Report/
 
 ## To view the plotly visualizations, please open the following links:
-<br>
 ### Consolidated View:
 <br>
 http://nbviewer.jupyter.org/github/shailendrapatil92/Data-Visualization/blob/master/all_visualizations.ipynb
