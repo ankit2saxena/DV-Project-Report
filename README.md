@@ -1,7 +1,7 @@
 # DV-Project-Report
-by Karthik Anbazhagan, Shailendra Patil, Ankit Saxena
-<br/>
 Data Visualization Project Report: Causal effect of the Great Recession on Unemployment across the US
+<br/>
+by Karthik Anbazhagan, Shailendra Patil, Ankit Saxena
 
 ## To view the d3 visualizations, please open the following link:
 https://ankit2saxena.github.io/DV-Project-Report/
